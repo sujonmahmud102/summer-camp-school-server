@@ -6,7 +6,7 @@ const {
     MongoClient,
     ServerApiVersion
 } = require('mongodb');
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 
 // middleware
@@ -40,7 +40,9 @@ async function run() {
         // create users
         app.post('/users', async (req, res) => {
             const user = req.body;
-            console.log(user)
+            console.log(user);
+            const result = await usersCollection.insertOne(user);
+            res.send(result);
         })
 
         // Send a ping to confirm a successful connection
