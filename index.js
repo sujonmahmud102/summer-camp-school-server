@@ -95,6 +95,17 @@ async function run() {
             res.send(result);
         })
 
+        // instructors api
+        app.get('/instructors', async (req, res) => {
+            const query = {
+                role: 'Instructor'
+            }
+
+            const result = await usersCollection.find(query).toArray();
+
+            res.send(result);
+        })
+
 
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({
