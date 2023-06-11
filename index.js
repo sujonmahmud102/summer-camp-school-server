@@ -116,6 +116,11 @@ async function run() {
             res.send(result);
         })
 
+        // classes api
+        app.get('/classes', async (req, res) => {
+            const result = await classesCollection.find().toArray();
+            res.send(result);
+        })
 
 
         // Send a ping to confirm a successful connection
