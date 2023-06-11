@@ -35,6 +35,7 @@ async function run() {
 
         // collections
         const usersCollection = client.db('summerDB').collection('users');
+        const classesCollection = client.db('summerDB').collection('classes');
 
 
 
@@ -105,6 +106,16 @@ async function run() {
 
             res.send(result);
         })
+
+        // create classes
+        app.post('/classes', async (req, res) => {
+            const newClass = req.body;
+            // console.log(newClass);
+
+            const result = await classesCollection.insertOne(newClass);
+            res.send(result);
+        })
+
 
 
         // Send a ping to confirm a successful connection
