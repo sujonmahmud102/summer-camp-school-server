@@ -66,6 +66,9 @@ async function run() {
             res.send(result);
         })
 
+
+        // admin panel functionality
+
         // making admin
         app.patch('/users/admin/:id', async (req, res) => {
             const id = req.params.id;
@@ -80,6 +83,39 @@ async function run() {
             const result = await usersCollection.updateOne(filter, updateDoc);
             res.send(result);
         })
+
+        // classes approval
+        app.patch('/classes/approve/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = {
+                _id: new ObjectId(id)
+            };
+            const updateDoc = {
+                $set: {
+                    status: 'approved'
+                },
+            };
+            const result = await classesCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+
+        // classes denied
+        app.patch('/classes/deny/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = {
+                _id: new ObjectId(id)
+            };
+            const updateDoc = {
+                $set: {
+                    status: 'denied'
+                },
+            };
+            const result = await classesCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+
+
+        //  instructor panel functionality
 
         // making instructor
         app.patch('/users/instructor/:id', async (req, res) => {
@@ -121,6 +157,10 @@ async function run() {
             const result = await classesCollection.find().toArray();
             res.send(result);
         })
+
+        //  student panel functionality
+
+
 
 
         // Send a ping to confirm a successful connection
