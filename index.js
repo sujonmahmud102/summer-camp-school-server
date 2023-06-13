@@ -39,6 +39,7 @@ async function run() {
 
 
 
+
         // create users
         app.post('/users', async (req, res) => {
             const user = req.body;
@@ -66,6 +67,21 @@ async function run() {
             res.send(result);
         })
 
+
+        // common functionality
+        // classes api for admin & specific instructor
+        app.get('/classes', async (req, res) => {
+
+            let query = {};
+            if (req.query.instructorEmail) {
+                query = {
+                    instructorEmail: req.query.instructorEmail
+                }
+            }
+
+            const result = await classesCollection.find(query).toArray();
+            res.send(result)
+        })
 
         // admin panel functionality
 
@@ -114,6 +130,23 @@ async function run() {
             res.send(result);
         })
 
+        // classes feedback
+        app.patch('/classes/feedback/:id', async (req, res) => {
+            const id = req.params.id;
+            const feedbackMessage = req.body.feedback;
+            // console.log(id, feedbackMessage)
+            const filter = {
+                _id: new ObjectId(id)
+            };
+            const updateDoc = {
+                $set: {
+                    feedback: feedbackMessage
+                },
+            };
+            const result = await classesCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+
 
         //  instructor panel functionality
 
@@ -152,11 +185,6 @@ async function run() {
             res.send(result);
         })
 
-        // classes api
-        app.get('/classes', async (req, res) => {
-            const result = await classesCollection.find().toArray();
-            res.send(result);
-        })
 
         //  student panel functionality
 
