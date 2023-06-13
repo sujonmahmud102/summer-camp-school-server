@@ -187,7 +187,16 @@ async function run() {
 
 
         //  student panel functionality
+        // approved classes api
+        app.get('/approvedClasses', async (req, res) => {
+            const query = {
+                status: 'approved'
+            }
 
+            const result = await classesCollection.find(query).toArray();
+
+            res.send(result);
+        })
 
 
 
