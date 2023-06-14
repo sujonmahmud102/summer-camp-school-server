@@ -219,6 +219,19 @@ async function run() {
         })
 
 
+        // delete class
+        app.delete('/classes/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {
+                _id: new ObjectId(id)
+            };
+            const result = await classesCollection.deleteOne(query);
+
+            res.send(result);
+        })
+
+
+
         //  student panel functionality
         // approved classes api
         app.get('/approvedClasses', async (req, res) => {
@@ -230,6 +243,16 @@ async function run() {
 
             res.send(result);
         })
+
+
+        // popular classes
+        app.get('/popularClasses', async (req, res) => {
+            const result = await classesCollection.find().sort({
+                seats: -1
+            }).limit(6).toArray();
+            res.send(result);
+        });
+
 
 
 
