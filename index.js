@@ -186,6 +186,39 @@ async function run() {
         })
 
 
+        // single class api by id
+        app.get('/classes/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {
+                _id: new ObjectId(id)
+            };
+            const result = await classesCollection.findOne(query);
+            res.send(result);
+        })
+
+        // update class
+        app.put('/updateClass/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = {
+                _id: new ObjectId(id)
+            };
+            const updatedClass = req.body;
+            const options = {
+                upsert: true
+            };
+            const cls = {
+                $set: {
+                    className: updatedClass.className,
+                    classImage: updatedClass.classImage,
+                    seats: updatedClass.seats,
+                    price: updatedClass.price,
+                }
+            };
+            const result = await classesCollection.updateOne(filter, cls, options);
+            res.send(result);
+        })
+
+
         //  student panel functionality
         // approved classes api
         app.get('/approvedClasses', async (req, res) => {
