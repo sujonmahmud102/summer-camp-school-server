@@ -36,6 +36,7 @@ async function run() {
         // collections
         const usersCollection = client.db('summerDB').collection('users');
         const classesCollection = client.db('summerDB').collection('classes');
+        const cartsCollection = client.db('summerDB').collection('carts');
 
 
 
@@ -253,7 +254,42 @@ async function run() {
             res.send(result);
         });
 
+        // cart collection create 
+        app.post('/carts', async (req, res) => {
+            const item = req.body;
+            // console.log(item);
+            const result = await cartsCollection.insertOne(item);
+            res.send(result);
+        })
 
+        // carts api
+        app.get('/carts', async (req, res) => {
+            const result = await cartsCollection.find().toArray();
+            res.send(result);
+        })
+
+        // student selected classes api from cart collection
+        app.get('/selectedClasses', async (req, res) => {
+            const studentEmail = req.query.studentEmail;
+            const query = {
+                email: studentEmail
+            };
+            const result = await cartsCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        // app.get('/classes', async (req, res) => {
+
+        //     let query = {};
+        //     if (req.query.instructorEmail) {
+        //         query = {
+        //             instructorEmail: req.query.instructorEmail
+        //         }
+        //     }
+
+        //     const result = await classesCollection.find(query).toArray();
+        //     res.send(result)
+        // })
 
 
         // Send a ping to confirm a successful connection
