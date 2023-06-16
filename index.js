@@ -60,6 +60,7 @@ async function run() {
         const usersCollection = client.db('summerDB').collection('users');
         const classesCollection = client.db('summerDB').collection('classes');
         const cartsCollection = client.db('summerDB').collection('carts');
+        const paymentCollection = client.db('summerDB').collection('payments');
 
 
 
@@ -82,7 +83,7 @@ async function run() {
                 email: email
             }
             const user = await usersCollection.findOne(query);
-            if (user?.role !== 'Admin') {
+            if (user ?.role !== 'Admin') {
                 return res.status(403).send({
                     error: true,
                     message: 'forbidden message'
@@ -148,7 +149,7 @@ async function run() {
             }
             const user = await usersCollection.findOne(query);
             const result = {
-                admin: user?.role === 'Admin'
+                admin: user ?.role === 'Admin'
             }
             res.send(result);
         })
@@ -239,7 +240,7 @@ async function run() {
             }
             const user = await usersCollection.findOne(query);
             const result = {
-                instructor: user?.role === 'Instructor'
+                instructor: user ?.role === 'Instructor'
             }
             res.send(result);
         })
@@ -355,11 +356,30 @@ async function run() {
             res.send(result);
         })
 
-        // carts api
-        app.get('/carts', async (req, res) => {
-            const result = await cartsCollection.find().toArray();
-            res.send(result);
-        })
+        // // carts api
+        // app.get('/carts', async (req, res) => {
+        //     const result = await cartsCollection.find().toArray();
+        //     res.send(result);
+        // })
+
+ // cart  apis
+ app.get('/carts', verifyJWT, async (req, res) => {
+    const email = req.query.email;
+
+    if (!email) {
+      res.send([]);
+    }
+
+    const decodedEmail = req.decoded.email;
+    if (email !== decodedEmail) {
+      return res.status(403).send({ error: true, message: 'forbidden access' })
+    }
+
+    const query = { email: email };
+    const result = await cartsCollection.find(query).toArray();
+    res.send(result);
+  });
+
 
         // student selected classes api from cart collection
         app.get('/selectedClasses', async (req, res) => {
@@ -383,11 +403,12 @@ async function run() {
 
 
         // create payment intent
-        app.post('/create-payment-intent', async (req, res) => {
-            const price = req.body;
-            console.log(price)
+        app.post('/create-payment-intent',verifyJWT, async (req, res) => {
+            const {price} = req.body;
 
             const amount = parseInt(price * 100);
+
+            // console.log(price, amount)
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: amount,
                 currency: 'usd',
@@ -398,6 +419,20 @@ async function run() {
                 clientSecret: paymentIntent.client_secret
             })
         })
+
+// payment  api
+app.post('/payments', verifyJWT, async (req, res) => {
+    const payment = req.body;
+    const id = req.body.cartId;
+    const insertResult = await paymentCollection.insertOne(payment);
+
+    const query = {
+        _id: new ObjectId(id)
+    };
+    const deleteResult = await cartsCollection.deleteOne(query);
+
+    res.send({ insertResult, deleteResult });
+  })
 
 
         // Send a ping to confirm a successful connection
