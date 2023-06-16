@@ -161,7 +161,7 @@ async function run() {
         })
 
         // making admin
-        app.patch('/users/admin/:id', async (req, res) => {
+        app.patch('/users/admin/:id',verifyJWT, verifyAdmin,  async (req, res) => {
             const id = req.params.id;
             const filter = {
                 _id: new ObjectId(id)
@@ -176,7 +176,7 @@ async function run() {
         })
 
         // classes approval
-        app.patch('/classes/approve/:id', async (req, res) => {
+        app.patch('/classes/approve/:id',verifyJWT, verifyAdmin, async (req, res) => {
             const id = req.params.id;
             const filter = {
                 _id: new ObjectId(id)
@@ -191,7 +191,7 @@ async function run() {
         })
 
         // classes denied
-        app.patch('/classes/deny/:id', async (req, res) => {
+        app.patch('/classes/deny/:id', verifyJWT, verifyAdmin, async (req, res) => {
             const id = req.params.id;
             const filter = {
                 _id: new ObjectId(id)
@@ -206,7 +206,7 @@ async function run() {
         })
 
         // classes feedback
-        app.patch('/classes/feedback/:id', async (req, res) => {
+        app.patch('/classes/feedback/:id', verifyJWT, verifyAdmin, async (req, res) => {
             const id = req.params.id;
             const feedbackMessage = req.body.feedback;
             // console.log(id, feedbackMessage)
@@ -221,6 +221,17 @@ async function run() {
             const result = await classesCollection.updateOne(filter, updateDoc);
             res.send(result);
         })
+
+
+
+
+
+
+
+
+
+
+
 
 
         //  instructor panel functionality
@@ -292,7 +303,7 @@ async function run() {
         })
 
         // update class
-        app.put('/updateClass/:id', async (req, res) => {
+        app.put('/updateClass/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const filter = {
                 _id: new ObjectId(id)
@@ -324,6 +335,19 @@ async function run() {
 
             res.send(result);
         })
+
+        app.get('/totalEnrolled', verifyJWT, async (req, res) => {
+
+        const result = await paymentCollection.find().toArray();
+        res.send(result);
+        });
+
+
+      
+
+
+
+
 
 
 
@@ -433,6 +457,51 @@ app.post('/payments', verifyJWT, async (req, res) => {
 
     res.send({ insertResult, deleteResult });
   })
+
+//   enrolled and payment history api
+app.get('/enrolled', verifyJWT, async (req, res) => {
+    const email = req.query.email;
+
+    if (!email) {
+      res.send([]);
+    }
+
+    const decodedEmail = req.decoded.email;
+    if (email !== decodedEmail) {
+      return res.status(403).send({ error: true, message: 'forbidden access' })
+    }
+
+    const query = { email: email };
+    const result = await paymentCollection.find(query).toArray();
+    res.send(result);
+  });
+
+      // reduce seat 1 
+    //   app.patch('/classes/reduce-seats/:id', verifyJWT,  async (req, res) => {
+    //     const id = req.params.id;
+    //     const filter = {
+    //         _id: new ObjectId(id)
+    //     };
+
+    //     console.log(id)
+    //     // const updateDoc = {
+    //     //     $inc: {
+    //     //         seats: -1
+    //     //     },
+    //     // };
+    //     // const result = await classesCollection.updateOne(filter, updateDoc);
+    //     // res.send(result);
+    // })
+
+
+
+
+
+
+
+
+
+
 
 
         // Send a ping to confirm a successful connection
